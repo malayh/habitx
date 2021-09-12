@@ -21,11 +21,29 @@ function blockURL() {
 
 $(document).ready(()=>{
     injectBlockerToDOM();
-    // blockURL();
-    setTimeout(blockURL,2000);
-    
 });
 
 window.addEventListener('fromDOMToHabitx', (e)=> {
-    console.log(e);
+    if(! e.detail ){
+        console.log("No detail attached with event from DOM.");
+        return;
+    }
+    
+    const message = e.detail;
+
+    if( ! message.action ){
+        console.log("No action specified.");
+        return;
+    }
+
+    switch(message.action){
+        case 'init_complete':
+            // Meaning DOM is loaded successfully.
+            blockURL();
+            break;
+
+        default:
+            console.log(`Unknown action ${message.action}`);
+    }
+
 });
