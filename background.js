@@ -1,21 +1,21 @@
 
 
-// chrome.tabs.onUpdated.addListener( async (tabId, changeInfo, tab) => {
-//     let delayPage = chrome.runtime.getURL("delay.html");
-//     let httpRegex = new RegExp("https{0,1}://");
+// Installing HabitX
+chrome.runtime.onInstalled.addListener(function(details){
+    if(details.reason == "install"){
+        console.log("Installing Habitx....");
 
-//     if( changeInfo.url && httpRegex.test(changeInfo.url)) {
-        
-//         // await chrome.storage.local.set({`{tabId: changeInfo.url});
-//         // await chrome.storage.local.set({'test': 'asd'});
+    }else if(details.reason == "update"){
+        console.log("Updating HabitX...")
+    }
 
+    const block_list = [
+        { url : 'youtube.com'},
+        { url : 'reddit.com'},
+        { url : 'twitter.com'},
+        { url : 'guthib.com'}
+    ]
 
-//         // console.log(tabId);
-//         // // chrome.storage.local.set()
-
-//         // let x = ""+changeInfo.url;
-//         // console.log(x);
-
-//         // chrome.tabs.update( tabId, {url: delayPage});
-//     }
-// });
+    chrome.storage.sync.set({'habitx_block_countdown_seconds':1});
+    chrome.storage.sync.set({'habitx_blocked_list': block_list});
+});

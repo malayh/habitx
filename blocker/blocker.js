@@ -7,9 +7,9 @@ function habitx_sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function habitx_blockCountDown(){
+async function habitx_blockCountDown(countdownTime){
     let timer = document.getElementById("habitx-timer");
-    for(let i = 10; i>=0; i--){
+    for(let i = countdownTime; i>=0; i--){
         timer.textContent = i;
         await habitx_sleep(1000);
     }
@@ -27,12 +27,12 @@ function habitx_unblockAccess(){
     window.dispatchEvent(event);
 }
 
-function habitx_blockAccess(url){
+function habitx_blockAccess(url, countdownTime){
     let _url = document.getElementById('habitx-blocker-contents').getElementsByClassName('blocked-url')[0];
     _url.textContent = url;
     document.getElementById("habitx-blocker-main").style.display = 'block';
     document.getElementById("unblock-button").style.display = 'none';
-    setTimeout(()=>habitx_blockCountDown(),0);
+    setTimeout(()=>habitx_blockCountDown(countdownTime),0);
 }
 
 function habitx_signalInitComplete(){
@@ -64,7 +64,7 @@ window.addEventListener('fromHabitxToDOM',(e)=>{
 
     switch(message.action) {
         case 'block':
-            habitx_blockAccess(message.url);
+            habitx_blockAccess(message.url, message.countdownTime);
             break;
 
         default:

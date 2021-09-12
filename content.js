@@ -9,18 +9,43 @@ function injectBlockerToDOM(){
 
 
 function blockURL() {
-    const _detail = {
-        action : 'block',
-        url : window.location.href
-    };
+    chrome.storage.sync.get('habitx_block_countdown_seconds',(data) => {
+        if(!data || !data.habitx_block_countdown_seconds){
+            console.log("Habitx not installed properly. `habitx_block_countdown_seconds` missing in storage.")
+            return;
+        }
 
-    let blockEvent = new CustomEvent("fromHabitxToDOM", {detail: _detail} );
-    window.dispatchEvent(blockEvent);
+        const _detail = {
+            action : 'block',
+            url : window.location.href,
+            countdownTime : data.habitx_block_countdown_seconds
+        };
+
+        const blockEvent = new CustomEvent("fromHabitxToDOM", {detail: _detail} );
+        window.dispatchEvent(blockEvent);
+    });
 }
 
 
 $(document).ready(()=>{
-    injectBlockerToDOM();
+    // This is the entry point to the entire thingy
+    let currentUrl = window.location.href;
+
+    chrome.storage.sync.get('habitx_blocked_list',(data)=>{
+        if(!data || !data.habitx_blocked_list ){
+            console.log("Habitx not installed properly. `habitx_blocked_list` missing in storage.")
+            return;
+        }
+
+        for(const blockedSite of data.habitx_blocked_list ){
+            const _rx = new RegExp(blockedSite.url);
+            if(_rx.test(currentUrl)){
+                injectBlockerToDOM();
+                return;
+            } 
+        }
+
+    });
 });
 
 window.addEventListener('fromDOMToHabitx', (e)=> {
