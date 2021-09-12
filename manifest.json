@@ -1,0 +1,32 @@
+{
+    "name": "HabitX",
+    "description": "Add friction in your mindless browsing habits.",
+    "version": "1.0",
+    "manifest_version": 3,
+    "permissions": [
+        "tabs", "storage", "<all_urls>"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "jquery-3.6.0.min.js",
+                "content.js"
+            ],
+            "run_at": "document_end",
+            "all_frames": true,
+            "match_about_blank": true
+        }
+    ],
+    "web_accessible_resources": [
+        {
+            "resources": [ "blocker/blocker.html", "blocker/blocker.css", "blocker/blocker.js"],
+            "matches": [ "<all_urls>" ]
+        }
+    ]
+}

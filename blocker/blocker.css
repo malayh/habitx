@@ -1,0 +1,25 @@
+#habitx-blocker-main {
+    display: none;
+    height: 100%;
+    width: 100%;
+    position: fixed;
+    z-index: 1000000; /* To make sure blocker is always on top */
+    left: 0;
+    top: 0;
+    background-color: rgb(255, 255, 255);
+    opacity: 1;
+    overflow-x: hidden;
+    font-family: monospace !important;
+}
+
+#habitx-blocker-contents {
+    position: relative;
+
+    max-width: 950px;
+    min-width: 320px;
+    margin: 0 auto;
+    margin-top: 10vh;
+    background-color: rgb(202, 202, 202);
+    padding: 60px 75px;
+    border-radius: 5px;
+}
