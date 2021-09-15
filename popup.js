@@ -7,7 +7,7 @@ const global_state = {
 function is_site_blocked(hostname) {
     for(const site of global_state.habitx_blocked_list) {
         const _rx = new RegExp(site.url);
-        if( _rx.test(site.url) ){
+        if( _rx.test(hostname) ){
             return true; 
         }
     }
@@ -36,9 +36,6 @@ function renderUI() {
             $("#is-blocked-banner").css('display','none');
         }
     });
-
-
-
 
 }
 
