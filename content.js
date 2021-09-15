@@ -1,3 +1,9 @@
+// How it works:
+// - If current url is in blocked_list -> inject blocker to dom
+// - When DOM finishes loading generate init_complete event -> content_scipt listens for this event
+// - on init_complete event content_scipt generates block event which blocker script listens for
+// - on block event blocker script blocks the current page
+
 function injectBlockerToDOM(){
     $('head').append(`<link rel="stylesheet" type="text/css" href="${chrome.runtime.getURL("/blocker/blocker.css")}">`);
     $.get(chrome.runtime.getURL("/blocker/blocker.html"), function(data) {
@@ -6,7 +12,6 @@ function injectBlockerToDOM(){
         $('body').append(`<script src="${chrome.runtime.getURL("/blocker/blocker.js")}"/>`);
     });
 };
-
 
 function blockURL() {
     chrome.storage.sync.get('habitx_block_countdown_seconds',(data) => {
@@ -26,12 +31,15 @@ function blockURL() {
     });
 }
 
-
 $(document).ready(()=>{
     // This is the entry point to the entire thingy
     let currentUrl = window.location.href;
 
-    chrome.storage.sync.get('habitx_blocked_list',(data)=>{
+    chrome.storage.sync.get(['habitx_enabled','habitx_blocked_list'],(data)=>{
+        if( !data.habitx_enabled ) {
+            return;
+        }
+
         if(!data || !data.habitx_blocked_list ){
             console.log("Habitx not installed properly. `habitx_blocked_list` missing in storage.")
             return;

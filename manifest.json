@@ -28,5 +28,10 @@
             "resources": [ "blocker/blocker.html", "blocker/blocker.css", "blocker/blocker.js"],
             "matches": [ "<all_urls>" ]
         }
-    ]
+    ],
+    "action": {
+        "default_title": "HabitX",
+        "default_icon": "assets/habitx128.png",
+        "default_popup": "popup.html"
+    }
 }

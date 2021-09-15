@@ -28,6 +28,10 @@ function habitx_unblockAccess(){
 }
 
 function habitx_blockAccess(url, countdownTime){
+    // Args:
+    //      url: str : current url
+    //      countdownTime : int : how many seconds to count down before unblocking
+    
     let _url = document.getElementById('habitx-blocker-contents').getElementsByClassName('blocked-url')[0];
     _url.textContent = url;
     document.getElementById("habitx-blocker-main").style.display = 'block';

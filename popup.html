@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>HabitX settings</title>
+    <link rel="stylesheet" type="text/css" href="popup.css" />
+    <script src="jquery-3.6.0.min.js"></script>
+
+</head>
+<body>
+    <div id="header">
+        <div class="icon">
+            <img src="assets/habitx128.png">
+            <h1>HabitX</h1>
+        </div>
+        <label class="switch">
+            <input type="checkbox" id="habitx-enabled">
+            <span class="slider round"></span>
+        </label>
+    </div>
+
+    <button id="add-button">
+        Block this site
+    </button>
+
+    <div id="is-blocked-banner">
+        This site is blocked
+        <img src="./assets/checkbox.svg">
+    </div>
+    
+    <h2>Sites blocked</h2>
+    <div id="blocked-list">
+        <div class="blocked-list-item" key >
+            <input type="text" value="youtube.com">
+            <img src="assets/cancel-xxl.png">
+        </div>
+
+        <div class="blocked-list-item">
+            <input type="text" value="youtube.com">
+            <img src="assets/cancel-xxl.png">
+        </div>  
+
+        <div class="blocked-list-item">
+            <input type="text" value="youtube.com">
+            <img src="assets/cancel-xxl.png">
+        </div>
+
+        <div class="blocked-list-item">
+            <input type="text" value="youtube.com">
+            <img src="assets/cancel-xxl.png">
+        </div>
+
+        <div class="blocked-list-item">
+            <input type="text" value="youtube.com">
+            <img src="assets/cancel-xxl.png">
+        </div>
+    </div>
+
+    <h2>Settings</h2>
+    <div class="settings-item">
+        <h3 class="label">Block Timeout</h3>
+        <span class="value" id="block-timeout-value"></span>
+        <input type="range" min="0" max="300" id="block-timeout">
+    </div>
+    
+    <script src="popup.js"></script>
+</body>
+</html>
