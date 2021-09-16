@@ -16,7 +16,9 @@ chrome.runtime.onInstalled.addListener(function(details){
         { url : 'guthib.com'}
     ]
 
-    chrome.storage.sync.set({'habitx_enabled': true});
-    chrome.storage.sync.set({'habitx_block_countdown_seconds':1});
-    chrome.storage.sync.set({'habitx_blocked_list': block_list});
+    chrome.storage.sync.set({
+        'habitxIsEnabled': true,
+        'habitxBlockCountdownSeconds':1,
+        'habitxBlockedSites': block_list
+    });
 });
