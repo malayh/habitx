@@ -31,7 +31,7 @@
     ],
     "action": {
         "default_title": "HabitX",
-        "default_icon": "assets/habitx128.png",
-        "default_popup": "popup.html"
+        "default_icon": "./popup/src/assets/img/habitx128.png",
+        "default_popup": "./popup/build/index.html"
     }
 }
