@@ -1,0 +1,69 @@
+@import url("./assets/css/slider_switch.css");
+
+@font-face {
+    font-family: "Montserrat";
+    src: url("./assets/fonts/Montserrat-Regular.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "Montserrat";
+    src: url("./assets/fonts/Montserrat-SemiBold.ttf") format("truetype");
+    font-weight: bold;
+    font-style: normal;
+}
+@font-face {
+    font-family: "Montserrat";
+    src: url("./assets/fonts/Montserrat-Light.ttf") format("truetype");
+    font-weight: 100;
+    font-style: normal;
+}
+
+body {
+    font-family: 'Montserrat';
+    font-weight: normal;
+    margin: 0 auto;
+    padding: 20px;
+    width: 300px;
+    height: 500px;
+}
+
+
+#header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+#header img {
+    width: 50px;
+    height: 50px;
+}
+#header .icon {
+    font-size: 32px;
+    font-weight: bold;
+}
+#header .icon .second{
+    color: #007fe3;
+}
+
+
+#is-blocked-banner {
+    margin-top: 10px;
+    align-self: center;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    background-color: rgb(174, 226, 208);
+    color: green;
+}
+#is-blocked-banner img {
+    padding: 5px;
+    width: 20px;
+}
+
