@@ -14,16 +14,41 @@ export default class Popup extends React.Component {
             habitxIsEnabled : false,
             habitxBlockedSites : [],
             habitxBlockCountdownSeconds : 10,
+
+            isCurrentSiteBlocked : false
         }
 
         window.chrome.storage.sync.get(['habitxIsEnabled','habitxBlockedSites','habitxBlockCountdownSeconds'], (data) => {
             this.setState(data);
+            this.isCurrentSiteBlocked();
         });
 
         this.syncConfig = () => {
-            window.chrome.storage.sync.set(this.state);
+            window.chrome.storage.sync.set({
+                habitxIsEnabled : this.state.habitxIsEnabled,
+                habitxBlockedSites : this.state.habitxBlockedSites,
+                habitxBlockCountdownSeconds : this.state.habitxBlockCountdownSeconds
+            });
         }
 
+    }
+
+    isCurrentSiteBlocked = () => {
+        window.chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            const tab = tabs[0];
+            const url = new URL(tab.url);
+            const domain = url.hostname;
+        
+            for(const site of this.state.habitxBlockedSites) {
+                const _rx = new RegExp(site.url);
+                if( _rx.test(domain) ){
+                    this.setState({isCurrentSiteBlocked: true});
+                    return;
+                }
+
+                this.setState({isCurrentSiteBlocked: false})
+            }
+        });
     }
 
     toggleEnable = () => {
@@ -54,6 +79,8 @@ export default class Popup extends React.Component {
                     This site is in the blocklist
                     <img src={checkmark}/>
                 </div>
+
+                {this.state.isCurrentSiteBlocked ? <div>Blocked</div> : <div>Not Blocked</div> }
 
 
             </div>

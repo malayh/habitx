@@ -14,16 +14,16 @@ function injectBlockerToDOM(){
 };
 
 function blockURL() {
-    chrome.storage.sync.get('habitx_block_countdown_seconds',(data) => {
-        if(!data || !data.habitx_block_countdown_seconds){
-            console.log("Habitx not installed properly. `habitx_block_countdown_seconds` missing in storage.")
+    chrome.storage.sync.get('habitxBlockCountdownSeconds',(data) => {
+        if(!data || !data.habitxBlockCountdownSeconds){
+            console.log("Habitx not installed properly. `habitxBlockCountdownSeconds` missing in storage.")
             return;
         }
 
         const _detail = {
             action : 'block',
             url : window.location.href,
-            countdownTime : data.habitx_block_countdown_seconds
+            countdownTime : data.habitxBlockCountdownSeconds
         };
 
         const blockEvent = new CustomEvent("fromHabitxToDOM", {detail: _detail} );
@@ -35,17 +35,17 @@ $(document).ready(()=>{
     // This is the entry point to the entire thingy
     let currentUrl = window.location.href;
 
-    chrome.storage.sync.get(['habitx_enabled','habitx_blocked_list'],(data)=>{
-        if( !data.habitx_enabled ) {
+    chrome.storage.sync.get(['habitxIsEnabled','habitxBlockedSites'],(data)=>{
+        if( !data.habitxIsEnabled ) {
             return;
         }
 
-        if(!data || !data.habitx_blocked_list ){
-            console.log("Habitx not installed properly. `habitx_blocked_list` missing in storage.")
+        if(!data || !data.habitxBlockedSites ){
+            console.log("Habitx not installed properly. `habitxBlockedSites` missing in storage.")
             return;
         }
 
-        for(const blockedSite of data.habitx_blocked_list ){
+        for(const blockedSite of data.habitxBlockedSites ){
             const _rx = new RegExp(blockedSite.url);
             if(_rx.test(currentUrl)){
                 injectBlockerToDOM();
