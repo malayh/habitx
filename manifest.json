@@ -1,8 +1,11 @@
 {
     "name": "HabitX",
     "description": "Add friction in your mindless browsing habits.",
-    "version": "1.0",
+    "version": "1.0.0",
     "manifest_version": 3,
+    "icons":{
+        "128": "./popup/src/assets/img/habitx128.png"
+    },
     "permissions": [
         "tabs", "storage", "<all_urls>"
     ],
