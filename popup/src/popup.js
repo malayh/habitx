@@ -2,81 +2,99 @@ import React from 'react';
 import './popup.css';
 
 // Images
-import checkmark from "./assets/img/checkbox.svg";
-import trash from "./assets/img/trash.svg";
-
+import checkmark from './assets/img/checkbox.svg';
+import trash from './assets/img/trash.svg';
 
 export default class Popup extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            habitxIsEnabled : false,
-            habitxBlockedSites : [],
-            habitxBlockCountdownSeconds : 10,
+            habitxIsEnabled: false,
+            habitxBlockedSites: [],
+            habitxBlockCountdownSeconds: 10,
 
-            isCurrentSiteBlocked : false,
-        }
-        
+            isCurrentSiteBlocked: false,
+        };
+
         this.currentHostName = null;
 
-        window.chrome.storage.sync.get(['habitxIsEnabled','habitxBlockedSites','habitxBlockCountdownSeconds'], (data) => {
-            this.setState(data);
-            this.isCurrentSiteBlocked();
-        });
-
+        window.chrome.storage.sync.get(
+            [
+                'habitxIsEnabled',
+                'habitxBlockedSites',
+                'habitxBlockCountdownSeconds',
+            ],
+            (data) => {
+                this.setState(data);
+                this.isCurrentSiteBlocked();
+            }
+        );
     }
 
     syncConfig = () => {
         window.chrome.storage.sync.set({
-            habitxIsEnabled : this.state.habitxIsEnabled,
-            habitxBlockedSites : this.state.habitxBlockedSites,
-            habitxBlockCountdownSeconds : this.state.habitxBlockCountdownSeconds
+            habitxIsEnabled: this.state.habitxIsEnabled,
+            habitxBlockedSites: this.state.habitxBlockedSites,
+            habitxBlockCountdownSeconds: this.state.habitxBlockCountdownSeconds,
         });
-    }
+    };
 
     isCurrentSiteBlocked = () => {
-        window.chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            const tab = tabs[0];
-            const url = new URL(tab.url);
-            const domain = url.hostname;
+        window.chrome.tabs.query(
+            { active: true, currentWindow: true },
+            (tabs) => {
+                const tab = tabs[0];
+                const url = new URL(tab.url);
+                const domain = url.hostname;
 
-            this.currentHostName = domain;
-        
-            for(const site of this.state.habitxBlockedSites) {
-                const _rx = new RegExp(site.url);
-                if( _rx.test(domain) ){
-                    this.setState({isCurrentSiteBlocked: true});
-                    return;
+                this.currentHostName = domain;
+
+                for (const site of this.state.habitxBlockedSites) {
+                    const _rx = new RegExp(site.url);
+                    if (_rx.test(domain)) {
+                        this.setState({ isCurrentSiteBlocked: true });
+                        return;
+                    }
+
+                    this.setState({ isCurrentSiteBlocked: false });
                 }
-
-                this.setState({isCurrentSiteBlocked: false})
             }
-        });
-    }
+        );
+    };
 
     toggleEnable = () => {
-        this.setState({habitxIsEnabled : !this.state.habitxIsEnabled}, ()=>this.syncConfig());
-    }
+        this.setState({ habitxIsEnabled: !this.state.habitxIsEnabled }, () =>
+            this.syncConfig()
+        );
+    };
 
     deleteFromBlockedList = (url) => {
-        const _new_list = this.state.habitxBlockedSites.filter((blockedSite)=>{
-            return blockedSite.url !== url;
-        });
+        const _new_list = this.state.habitxBlockedSites.filter(
+            (blockedSite) => {
+                return blockedSite.url !== url;
+            }
+        );
 
-        this.setState({habitxBlockedSites:_new_list,isCurrentSiteBlocked:false},()=>this.syncConfig());
-    }
+        this.setState(
+            { habitxBlockedSites: _new_list, isCurrentSiteBlocked: false },
+            () => this.syncConfig()
+        );
+    };
 
-    blockCurrentSite = () =>{
+    blockCurrentSite = () => {
         console.log(this.currentHostName);
-        if(!this.currentHostName){
+        if (!this.currentHostName) {
             return;
         }
 
         const _new_list = this.state.habitxBlockedSites.slice();
-        _new_list.push({url: this.currentHostName});
-        this.setState({habitxBlockedSites:_new_list,isCurrentSiteBlocked:true}, ()=>this.syncConfig());
-    }
+        _new_list.push({ url: this.currentHostName });
+        this.setState(
+            { habitxBlockedSites: _new_list, isCurrentSiteBlocked: true },
+            () => this.syncConfig()
+        );
+    };
 
     render() {
         console.log(this.state);
@@ -89,7 +107,7 @@ export default class Popup extends React.Component {
         const blockedBanner = (
             <div id="is-blocked-banner">
                 This site is in the blocklist
-                <img src={checkmark}/>
+                <img src={checkmark} />
             </div>
         );
 
@@ -102,10 +120,10 @@ export default class Popup extends React.Component {
                     </div>
 
                     <label className="switch">
-                        <input 
+                        <input
                             type="checkbox"
                             checked={this.state.habitxIsEnabled}
-                            onChange={()=>this.toggleEnable()}
+                            onChange={() => this.toggleEnable()}
                         />
                         <span className="slider round"></span>
                     </label>
@@ -117,19 +135,23 @@ export default class Popup extends React.Component {
 
                 <div id="blocked-list-container">
                     <h4>Blocked sites</h4>
-                    {
-
-                        this.state.habitxBlockedSites.map((blockedSite, index) => {
-                            return (
-                                <div className="blocker-list-item" key={index}>
-                                    <div className="url">{blockedSite.url}</div>
-                                    <div className="delete-button" onClick={()=>this.deleteFromBlockedList(blockedSite.url)}>
-                                        <img src={trash}/>
-                                    </div>
+                    {this.state.habitxBlockedSites.map((blockedSite, index) => {
+                        return (
+                            <div className="blocker-list-item" key={index}>
+                                <div className="url">{blockedSite.url}</div>
+                                <div
+                                    className="delete-button"
+                                    onClick={() =>
+                                        this.deleteFromBlockedList(
+                                            blockedSite.url
+                                        )
+                                    }
+                                >
+                                    <img src={trash} />
                                 </div>
-                            );
-                        })
-                    }
+                            </div>
+                        );
+                    })}
                 </div>
 
                 <div className="settings-item">
@@ -137,13 +159,20 @@ export default class Popup extends React.Component {
                     <div>{this.state.habitxBlockCountdownSeconds} sec</div>
                     <input
                         value={this.state.habitxBlockCountdownSeconds}
-                        type="range" 
-                        min="0" max="300" 
-                        onChange={(evt)=>this.setState({habitxBlockCountdownSeconds:evt.target.value},()=>this.syncConfig())}
+                        type="range"
+                        min="0"
+                        max="300"
+                        onChange={(evt) =>
+                            this.setState(
+                                {
+                                    habitxBlockCountdownSeconds:
+                                        evt.target.value,
+                                },
+                                () => this.syncConfig()
+                            )
+                        }
                     />
                 </div>
-                
-
             </div>
         );
     }
