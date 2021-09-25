@@ -1,9 +1,3 @@
-// How it works:
-// - If current url is in blocked_list -> inject blocker to dom
-// - When DOM finishes loading generate init_complete event -> content_scipt listens for this event
-// - on init_complete event content_scipt generates block event which blocker script listens for
-// - on block event blocker script blocks the current page
-
 function injectBlockerToDOM(){
     $('head').append(`<link rel="stylesheet" type="text/css" href="${chrome.runtime.getURL("/blocker/blocker.css")}">`);
     $.get(chrome.runtime.getURL("/blocker/blocker.html"), function(data) {
@@ -14,9 +8,27 @@ function injectBlockerToDOM(){
 };
 
 function blockURL() {
-    chrome.storage.sync.get('habitxBlockCountdownSeconds',(data) => {
+    chrome.storage.sync.get(['habitxIsEnabled','habitxBlockCountdownSeconds','habitxBlockedSites'],(data) => {
         if(!data || !data.habitxBlockCountdownSeconds){
             console.log("Habitx not installed properly. `habitxBlockCountdownSeconds` missing in storage.")
+            return;
+        }
+
+        if(!data.habitxIsEnabled) {
+            return;
+        }
+
+        let _should_block = false;
+        let currentUrl = window.location.href;
+        for(const blockedSite of data.habitxBlockedSites ){
+            const _rx = new RegExp(blockedSite.url);
+            if(_rx.test(currentUrl)){
+                _should_block = true;
+                break;
+            } 
+        }
+
+        if(!_should_block) {
             return;
         }
 
@@ -33,25 +45,15 @@ function blockURL() {
 
 $(document).ready(()=>{
     // This is the entry point to the entire thingy
-    let currentUrl = window.location.href;
 
     chrome.storage.sync.get(['habitxIsEnabled','habitxBlockedSites'],(data)=>{
-        if( !data.habitxIsEnabled ) {
-            return;
-        }
 
-        if(!data || !data.habitxBlockedSites ){
+        if(!data){
             console.log("Habitx not installed properly. `habitxBlockedSites` missing in storage.")
             return;
         }
 
-        for(const blockedSite of data.habitxBlockedSites ){
-            const _rx = new RegExp(blockedSite.url);
-            if(_rx.test(currentUrl)){
-                injectBlockerToDOM();
-                return;
-            } 
-        }
+        injectBlockerToDOM();
 
     });
 });
