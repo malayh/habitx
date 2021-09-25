@@ -5,6 +5,14 @@ import './popup.css';
 import checkmark from './assets/img/checkbox.svg';
 import trash from './assets/img/trash.svg';
 
+const default_config_keys = [
+    'habitxIsEnabled',
+    'habitxBlockedSites',
+    'habitxBlockCountdownSeconds',
+    'habitxInteruptAfterMinutes',
+    'habitxReenableAfterMinutes',
+];
+
 export default class Popup extends React.Component {
     constructor(props) {
         super(props);
@@ -13,31 +21,31 @@ export default class Popup extends React.Component {
             habitxIsEnabled: false,
             habitxBlockedSites: [],
             habitxBlockCountdownSeconds: 10,
+            habitxInteruptAfterMinutes: 5,
+            habitxReenableAfterMinutes: 5,
 
             isCurrentSiteBlocked: false,
         };
 
         this.currentHostName = null;
 
-        window.chrome.storage.sync.get(
-            [
-                'habitxIsEnabled',
-                'habitxBlockedSites',
-                'habitxBlockCountdownSeconds',
-            ],
-            (data) => {
-                this.setState(data);
-                this.isCurrentSiteBlocked();
-            }
-        );
+        window.chrome.storage.sync.get(default_config_keys, (data) => {
+            this.setState(data);
+            this.isCurrentSiteBlocked();
+        });
     }
 
+    _setState = (...args) => {
+        this.setState(...args, () => this.syncConfig());
+    };
+
     syncConfig = () => {
-        window.chrome.storage.sync.set({
-            habitxIsEnabled: this.state.habitxIsEnabled,
-            habitxBlockedSites: this.state.habitxBlockedSites,
-            habitxBlockCountdownSeconds: this.state.habitxBlockCountdownSeconds,
-        });
+        let _obj = {};
+        for (const key of default_config_keys) {
+            _obj[key] = this.state[key];
+        }
+
+        window.chrome.storage.sync.set(_obj);
     };
 
     isCurrentSiteBlocked = () => {
@@ -83,7 +91,6 @@ export default class Popup extends React.Component {
     };
 
     blockCurrentSite = () => {
-        console.log(this.currentHostName);
         if (!this.currentHostName) {
             return;
         }
@@ -131,8 +138,6 @@ export default class Popup extends React.Component {
 
                 {this.state.isCurrentSiteBlocked ? blockedBanner : blockButton}
 
-                <h3>Settings</h3>
-
                 <div id="blocked-list-container">
                     <h4>Blocked sites</h4>
                     {this.state.habitxBlockedSites.map((blockedSite, index) => {
@@ -155,21 +160,55 @@ export default class Popup extends React.Component {
                 </div>
 
                 <div className="settings-item">
-                    <h4>Block timeout</h4>
-                    <div>{this.state.habitxBlockCountdownSeconds} sec</div>
+                    <div className="name">Block timeout</div>
+                    <div clasName="value">
+                        {this.state.habitxBlockCountdownSeconds} sec
+                    </div>
                     <input
                         value={this.state.habitxBlockCountdownSeconds}
                         type="range"
                         min="0"
                         max="300"
                         onChange={(evt) =>
-                            this.setState(
-                                {
-                                    habitxBlockCountdownSeconds:
-                                        evt.target.value,
-                                },
-                                () => this.syncConfig()
-                            )
+                            this._setState({
+                                habitxBlockCountdownSeconds: evt.target.value,
+                            })
+                        }
+                    />
+                </div>
+
+                <div className="settings-item">
+                    <div className="name">Interupt every</div>
+                    <div clasName="value">
+                        {this.state.habitxInteruptAfterMinutes} minutes
+                    </div>
+                    <input
+                        value={this.state.habitxInteruptAfterMinutes}
+                        type="range"
+                        min="1"
+                        max="120"
+                        onChange={(evt) =>
+                            this._setState({
+                                habitxInteruptAfterMinutes: evt.target.value,
+                            })
+                        }
+                    />
+                </div>
+
+                <div className="settings-item">
+                    <div className="name">Reenable after</div>
+                    <div clasName="value">
+                        {this.state.habitxReenableAfterMinutes} minutes
+                    </div>
+                    <input
+                        value={this.state.habitxReenableAfterMinutes}
+                        type="range"
+                        min="1"
+                        max="120"
+                        onChange={(evt) =>
+                            this._setState({
+                                habitxReenableAfterMinutes: evt.target.value,
+                            })
                         }
                     />
                 </div>
