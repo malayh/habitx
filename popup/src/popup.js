@@ -5,17 +5,17 @@ import './popup.css';
 import checkmark from './assets/img/checkbox.svg';
 import trash from './assets/img/trash.svg';
 
-const default_config_keys = [
-    'habitxIsEnabled',
-    'habitxBlockedSites',
-    'habitxBlockCountdownSeconds',
-    'habitxInteruptAfterMinutes',
-    'habitxReenableAfterMinutes',
-];
-
 export default class Popup extends React.Component {
     constructor(props) {
         super(props);
+
+        this.conf_keys_for_state = [
+            'habitxIsEnabled',
+            'habitxBlockedSites',
+            'habitxBlockCountdownSeconds',
+            'habitxInteruptAfterMinutes',
+            'habitxReenableAfterMinutes',
+        ];
 
         this.state = {
             habitxIsEnabled: false,
@@ -29,19 +29,18 @@ export default class Popup extends React.Component {
 
         this.currentHostName = null;
 
-        window.chrome.storage.sync.get(default_config_keys, (data) => {
-            this.setState(data);
-            this.isCurrentSiteBlocked();
+        window.chrome.storage.sync.get(this.conf_keys_for_state, (data) => {
+            this.setState(data, () => this.isCurrentSiteBlocked());
         });
     }
 
-    _setState = (...args) => {
-        this.setState(...args, () => this.syncConfig());
+    _setState = (args) => {
+        this.setState(args, () => this.syncConfig());
     };
 
     syncConfig = () => {
         let _obj = {};
-        for (const key of default_config_keys) {
+        for (const key of this.conf_keys_for_state) {
             _obj[key] = this.state[key];
         }
 
@@ -72,9 +71,14 @@ export default class Popup extends React.Component {
     };
 
     toggleEnable = () => {
-        this.setState({ habitxIsEnabled: !this.state.habitxIsEnabled }, () =>
-            this.syncConfig()
-        );
+        this.setState({ habitxIsEnabled: !this.state.habitxIsEnabled }, () => {
+            window.chrome.storage.sync.set({
+                habitxLastDisabledAt: this.state.habitxIsEnabled
+                    ? null
+                    : Date.now(),
+            });
+            this.syncConfig();
+        });
     };
 
     deleteFromBlockedList = (url) => {
@@ -84,10 +88,10 @@ export default class Popup extends React.Component {
             }
         );
 
-        this.setState(
-            { habitxBlockedSites: _new_list, isCurrentSiteBlocked: false },
-            () => this.syncConfig()
-        );
+        this.setState({ habitxBlockedSites: _new_list }, () => {
+            this.isCurrentSiteBlocked();
+            this.syncConfig();
+        });
     };
 
     blockCurrentSite = () => {
@@ -104,7 +108,6 @@ export default class Popup extends React.Component {
     };
 
     render() {
-        console.log(this.state);
         const blockButton = (
             <button id="add-button" onClick={this.blockCurrentSite}>
                 Block this site
@@ -170,9 +173,13 @@ export default class Popup extends React.Component {
                         min="0"
                         max="300"
                         onChange={(evt) =>
-                            this._setState({
-                                habitxBlockCountdownSeconds: evt.target.value,
-                            })
+                            this.setState(
+                                {
+                                    habitxBlockCountdownSeconds:
+                                        evt.target.value,
+                                },
+                                () => this.syncConfig()
+                            )
                         }
                     />
                 </div>
@@ -188,9 +195,13 @@ export default class Popup extends React.Component {
                         min="1"
                         max="120"
                         onChange={(evt) =>
-                            this._setState({
-                                habitxInteruptAfterMinutes: evt.target.value,
-                            })
+                            this.setState(
+                                {
+                                    habitxInteruptAfterMinutes:
+                                        evt.target.value,
+                                },
+                                () => this.syncConfig()
+                            )
                         }
                     />
                 </div>
@@ -206,9 +217,13 @@ export default class Popup extends React.Component {
                         min="1"
                         max="120"
                         onChange={(evt) =>
-                            this._setState({
-                                habitxReenableAfterMinutes: evt.target.value,
-                            })
+                            this.setState(
+                                {
+                                    habitxReenableAfterMinutes:
+                                        evt.target.value,
+                                },
+                                () => this.syncConfig()
+                            )
                         }
                     />
                 </div>

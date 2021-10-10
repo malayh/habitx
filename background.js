@@ -7,8 +7,34 @@ const default_conf = {
         { url : 'youtube.com'},
         { url : 'reddit.com'},
         { url : 'twitter.com'}
-    ]
+    ],
+    habitxLastDisabledAt : null
 }
+
+
+async function reEnabler() {
+    const timeout = 1000;
+
+    chrome.storage.sync.get(['habitxLastDisabledAt','habitxReenableAfterMinutes'], (data) => {
+        
+        if(!data.habitxLastDisabledAt){
+            setTimeout(()=>reEnabler(), timeout);
+            return;
+        }
+
+        const timeElapsed = Math.floor( data.habitxLastDisabledAt / 1000 ) + ( data.habitxReenableAfterMinutes * 60 );
+        const now = Math.floor(Date.now() / 1000);
+
+        if(now > timeElapsed){
+            console.log("Re-enabling now...");            
+            chrome.storage.sync.set({habitxIsEnabled: true, habitxLastDisabledAt:null },()=>{
+                setTimeout(()=>reEnabler(),timeout);
+            });
+        } else {
+            setTimeout(()=>reEnabler(),timeout);
+        }
+    });
+} 
 
 // Installing HabitX
 chrome.runtime.onInstalled.addListener(function(details){
@@ -34,3 +60,5 @@ chrome.runtime.onInstalled.addListener(function(details){
 
     }
 });
+
+reEnabler();
